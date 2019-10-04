@@ -1,0 +1,21 @@
+{
+  "name": "express-ejemplo",
+  "version": "1.0.0",
+  "description": "Practica con express y node js",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/app.js"
+  },
+  "author": "Acxel Morales",
+  "license": "ISC",
+  "devDependencies": {
+    "morgan": "^1.9.1",
+    "nodemon": "^1.19.3"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.2.0"
+  }
+}
