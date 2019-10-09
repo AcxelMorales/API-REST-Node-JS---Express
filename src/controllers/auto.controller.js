@@ -1,41 +1,58 @@
 const { validationResult } = require('express-validator');
 
-const data = require('../data/data');
+const Car = require('../models/car.model');
 
 //****************************************************************************
 //  GET ALL
 //****************************************************************************
-exports.getAll = (req, res) => {
-  res.json({
-    "ok"   : true,
-    "autos": data
-  });
+exports.getAll = async (req, res) => {
+  try {
+    const resp = await Car.find();
+
+    res.status(200).json({
+      ok  : true,
+      data: resp
+    });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      message: 'Error en la base de datos, no se pueden traer los datos',
+      error
+    });
+  }
 }
 
 //****************************************************************************
 //  GET ONE
 //****************************************************************************
-exports.getOne = (req, res) => {
-  let company = req.params.company;
-  const auto = data.find(a => a.company === company);
+exports.getOne = async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.id);
 
-  if (!auto) {
-    return res.status(404).json({
-      ok     : false,
-      message: `La compañia ${company} no existe`
+    if (car === null) {
+      return res.status(404).json({
+        ok: false,
+        message: `No existe un elemento con el ID ${req.params.id}`
+      });
+    }
+    
+    res.status(200).json({
+      ok: true,
+      car
+    });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      message: `Error al buscar el elemento`,
+      error
     });
   }
-
-  res.json({
-    "ok": true,
-    auto
-  });
 }
 
 //****************************************************************************
 //  POST
 //****************************************************************************
-exports.post = (req, res) => {
+exports.post = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -45,27 +62,35 @@ exports.post = (req, res) => {
     });
   }
 
-  let autoId = data.length;
+  try {
+    const car = new Car({
+      company: req.body.company,
+      model  : req.body.model,
+      year   : req.body.year,
+      sold   : req.body.sold,
+      price  : req.body.price,
+      extras : req.body.extras
+    });
 
-  const auto = {
-    id     : autoId,
-    company: req.body.company,
-    model  : req.body.model,
-    year   : req.body.year
-  };
+    const result = await car.save();
 
-  data.push(auto);
-
-  res.status(201).json({
-    ok: true,
-    auto
-  });
+    res.status(201).json({
+      ok  : true,
+      car : result
+    });
+  } catch (error) {
+    return res.status(400).json({
+      ok     : false,
+      message: 'Error al crear el elemento',
+      error
+    });
+  }
 }
 
 //****************************************************************************
 //  PUT
 //****************************************************************************
-exports.put = (req, res) => {
+exports.put = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -75,43 +100,62 @@ exports.put = (req, res) => {
     });
   }
 
-  const auto = data.find(a => a.id === parseInt(req.params.id));
+  try {
+    const car = await Car.findByIdAndUpdate(req.params.id, {
+      company: req.body.company,
+      model  : req.body.model,
+      year   : req.body.year,
+      sold   : req.body.sold,
+      price  : req.body.price,
+      extras : req.body.extras
+    }, {
+      new: true
+    });
 
-  if (!auto) {
+    if (car === null) {
+      return res.status(404).json({
+        ok: false,
+        message: `No existe un elemento con el ID ${req.params.id}`
+      });
+    }
+
+    res.status(200).json({
+      ok    : true,
+      update: car
+    });
+
+  } catch (error) {
     return res.status(404).json({
       ok     : false,
-      message: `No existe el auto con el ID ${req.params.id}`
+      message: 'Error al actualizar',
+      error
     });
   }
-
-  auto.company = req.body.company;
-  auto.model   = req.body.model;
-  auto.year    = req.body.year;
-
-  res.status(200).json({
-    ok: true,
-    auto
-  });
 }
 
 //****************************************************************************
 //  DELETE
 //****************************************************************************
-exports.delete = (req, res) => {
-  const auto = data.find(a => a.id === parseInt(req.params.id));
+exports.delete = async (req, res) => {
+  try {
+    const car = await Car.findByIdAndDelete(req.params.id);
 
-  if (!auto) {
+    if (car === null) {
+      return res.status(404).json({
+        ok     : false,
+        message: `No existe un elemento con el ID ${req.params.id}`
+      });
+    }
+
+    res.status(200).json({
+      ok    : true,
+      delete: car
+    });
+  } catch (error) {
     return res.status(404).json({
       ok     : false,
-      message: `No existe el auto con el ID ${req.params.id}`
+      message: `Error al eliminar`,
+      error
     });
   }
-
-  const index = data.indexOf(auto);
-  data.splice(index, 1);
-
-  res.status(200).json({
-    ok: true,
-    message: 'Auto eliminado'
-  });
 }
