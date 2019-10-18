@@ -1,42 +1,40 @@
 const express = require('express');
 const { check } = require('express-validator');
 
-const autoController = require('../controllers/auto.controller');
+const userController = require('../controllers/user.controller');
 
 const router = express.Router();
-const url = '/api/v1/autos';
+const url = '/api/v1/usuarios';
 
 //****************************************************************************
 //  GET ALL
 //****************************************************************************
-router.get(url, autoController.getAll);
+router.get(url, userController.getAll);
 
 //****************************************************************************
 //  GET ONE
 //****************************************************************************
-router.get(`${url}/:id`, autoController.getOne);
+router.get(`${url}/:id`, userController.getOne);
 
 //****************************************************************************
 //  POST
 //****************************************************************************
 router.post(url, [
-  check('company').trim().isLength({ min: 2 }),
-  check('model').trim().isLength({ min: 1 }),
-  check('year').isLength({ max: 4 })
-], autoController.post);
+  check('name').trim().isLength({ min: 3 }),
+  check('email').trim().isEmail(),
+], userController.post);
 
 //****************************************************************************
 //  PUT
 //****************************************************************************
 router.put(`${url}/:id`, [
-  check('company').trim().isLength({ min: 2 }),
-  check('model').trim().isLength({ min: 1 }),
-  check('year').isLength({ max: 4 })
-], autoController.put);
+  check('name').trim().isLength({ min: 3 }),
+  check('email').trim().isEmail(),
+], userController.put);
 
 //****************************************************************************
 //  DELETE
 //****************************************************************************
-router.delete(`${url}/:id`, autoController.delete);
+router.delete(`${url}/:id`, userController.delete);
 
 module.exports = router;

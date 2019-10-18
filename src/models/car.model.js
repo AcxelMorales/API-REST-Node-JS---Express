@@ -2,12 +2,8 @@ const { Schema, model } = require('mongoose');
 
 const carSchema = new Schema({
   company: {
-    type     : String,
-    required : true,
-    uppercase: true,
-    trim     : true,
-    minlength: 2,
-    maxlength: 99,
+    type: Schema.Types.ObjectId,
+    ref : 'company' 
   },
   model: {
     type     : String,

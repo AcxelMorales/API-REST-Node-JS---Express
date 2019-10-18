@@ -1,16 +1,16 @@
 const { validationResult } = require('express-validator');
 
-const Car = require('../models/car.model');
+const User = require('../models/user.model');
 
 //****************************************************************************
 //  GET ALL
 //****************************************************************************
 exports.getAll = async (req, res) => {
   try {
-    const resp = await Car.find().populate('company', 'name country');
+    const resp = await User.find();
 
     if (resp.length === 0) {
-      return res.status(400).json({
+      return res.status(200).json({
         ok  : true,
         resp: 'No hay registros en la base de datos'
       });
@@ -22,7 +22,7 @@ exports.getAll = async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({
-      ok     : false,
+      ok: false,
       message: 'Error en la base de datos, no se pueden traer los datos',
       error
     });
@@ -34,9 +34,9 @@ exports.getAll = async (req, res) => {
 //****************************************************************************
 exports.getOne = async (req, res) => {
   try {
-    const car = await Car.findById(req.params.id);
+    const user = await User.findById(req.params.id);
 
-    if (car === null) {
+    if (user === null) {
       return res.status(404).json({
         ok     : false,
         message: `No existe un elemento con el ID ${req.params.id}`
@@ -45,11 +45,11 @@ exports.getOne = async (req, res) => {
     
     res.status(200).json({
       ok: true,
-      car
+      user
     });
   } catch (error) {
     return res.status(400).json({
-      ok     : false,
+      ok: false,
       message: `Error al buscar el elemento`,
       error
     });
@@ -70,16 +70,13 @@ exports.post = async (req, res) => {
   }
 
   try {
-    const car = new Car({
-      company: req.body.company,
-      model  : req.body.model,
-      year   : req.body.year,
-      sold   : req.body.sold,
-      price  : req.body.price,
-      extras : req.body.extras
+    const user = new User({
+      name      : req.body.name,
+      email     : req.body.email,
+      isCustomer: req.body.isCustomer
     });
 
-    const result = await car.save();
+    const result = await user.save();
 
     res.status(201).json({
       ok  : true,
@@ -108,27 +105,24 @@ exports.put = async (req, res) => {
   }
 
   try {
-    const car = await Car.findByIdAndUpdate(req.params.id, {
-      company: req.body.company,
-      model  : req.body.model,
-      year   : req.body.year,
-      sold   : req.body.sold,
-      price  : req.body.price,
-      extras : req.body.extras
+    const user = await User.findByIdAndUpdate(req.params.id, {
+      name      : req.body.name,
+      email     : req.body.email,
+      isCustomer: req.body.isCustomer
     }, {
       new: true
     });
 
-    if (car === null) {
+    if (user === null) {
       return res.status(404).json({
-        ok     : false,
+        ok: false,
         message: `No existe un elemento con el ID ${req.params.id}`
       });
     }
 
     res.status(200).json({
       ok    : true,
-      update: car
+      update: user
     });
 
   } catch (error) {
@@ -145,9 +139,9 @@ exports.put = async (req, res) => {
 //****************************************************************************
 exports.delete = async (req, res) => {
   try {
-    const car = await Car.findByIdAndDelete(req.params.id);
+    const user = await User.findByIdAndDelete(req.params.id);
 
-    if (car === null) {
+    if (user === null) {
       return res.status(404).json({
         ok     : false,
         message: `No existe un elemento con el ID ${req.params.id}`
@@ -156,7 +150,7 @@ exports.delete = async (req, res) => {
 
     res.status(200).json({
       ok    : true,
-      delete: car
+      delete: user
     });
   } catch (error) {
     return res.status(404).json({

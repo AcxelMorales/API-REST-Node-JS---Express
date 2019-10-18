@@ -21,12 +21,15 @@ app.use(bp.json())
 //****************************************************************************
 //  ROUTES
 //****************************************************************************
-app.use(require('./routes/app.routes'));
+app.use(require('./routes/cars.routes'));
+app.use(require('./routes/user.routes'));
+app.use(require('./routes/company.routes'));
+app.use(require('./routes/sale.routes'));
 
 //****************************************************************************
 //  LISTENER
 //****************************************************************************
-app.listen(app.get('port'), () => console.log(`Server online in port: ${app.get('port')}`));4
+app.listen(app.get('port'), () => console.log(`Server online in port: ${app.get('port')}`));
 
 //****************************************************************************
 //  DATABASE
@@ -38,3 +41,5 @@ mongoose.connect('mongodb://localhost/cars', {
 })
   .then(()   => console.log('Database online'))
   .catch(err => console.error(err));
+
+mongoose.set('useCreateIndex', true)

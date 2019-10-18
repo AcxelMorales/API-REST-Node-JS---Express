@@ -1,16 +1,16 @@
 const { validationResult } = require('express-validator');
 
-const Car = require('../models/car.model');
+const Company = require('../models/company.model');
 
 //****************************************************************************
 //  GET ALL
 //****************************************************************************
 exports.getAll = async (req, res) => {
   try {
-    const resp = await Car.find().populate('company', 'name country');
+    const resp = await Company.find();
 
     if (resp.length === 0) {
-      return res.status(400).json({
+      return res.status(200).json({
         ok  : true,
         resp: 'No hay registros en la base de datos'
       });
@@ -22,7 +22,7 @@ exports.getAll = async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({
-      ok     : false,
+      ok: false,
       message: 'Error en la base de datos, no se pueden traer los datos',
       error
     });
@@ -34,22 +34,22 @@ exports.getAll = async (req, res) => {
 //****************************************************************************
 exports.getOne = async (req, res) => {
   try {
-    const car = await Car.findById(req.params.id);
+    const company = await Company.findById(req.params.id);
 
-    if (car === null) {
+    if (company === null) {
       return res.status(404).json({
-        ok     : false,
+        ok: false,
         message: `No existe un elemento con el ID ${req.params.id}`
       });
     }
     
     res.status(200).json({
       ok: true,
-      car
+      company
     });
   } catch (error) {
     return res.status(400).json({
-      ok     : false,
+      ok: false,
       message: `Error al buscar el elemento`,
       error
     });
@@ -70,16 +70,12 @@ exports.post = async (req, res) => {
   }
 
   try {
-    const car = new Car({
-      company: req.body.company,
-      model  : req.body.model,
-      year   : req.body.year,
-      sold   : req.body.sold,
-      price  : req.body.price,
-      extras : req.body.extras
+    const company = new Company({
+      name   : req.body.name,
+      country: req.body.country
     });
 
-    const result = await car.save();
+    const result = await company.save();
 
     res.status(201).json({
       ok  : true,
@@ -108,18 +104,14 @@ exports.put = async (req, res) => {
   }
 
   try {
-    const car = await Car.findByIdAndUpdate(req.params.id, {
-      company: req.body.company,
-      model  : req.body.model,
-      year   : req.body.year,
-      sold   : req.body.sold,
-      price  : req.body.price,
-      extras : req.body.extras
+    const company = await Company.findByIdAndUpdate(req.params.id, {
+      name   : req.body.name,
+      country: req.body.country
     }, {
       new: true
     });
 
-    if (car === null) {
+    if (company === null) {
       return res.status(404).json({
         ok     : false,
         message: `No existe un elemento con el ID ${req.params.id}`
@@ -128,7 +120,7 @@ exports.put = async (req, res) => {
 
     res.status(200).json({
       ok    : true,
-      update: car
+      update: company
     });
 
   } catch (error) {
@@ -145,9 +137,9 @@ exports.put = async (req, res) => {
 //****************************************************************************
 exports.delete = async (req, res) => {
   try {
-    const car = await Car.findByIdAndDelete(req.params.id);
+    const company = await Company.findByIdAndDelete(req.params.id);
 
-    if (car === null) {
+    if (company === null) {
       return res.status(404).json({
         ok     : false,
         message: `No existe un elemento con el ID ${req.params.id}`
@@ -156,7 +148,7 @@ exports.delete = async (req, res) => {
 
     res.status(200).json({
       ok    : true,
-      delete: car
+      delete: company
     });
   } catch (error) {
     return res.status(404).json({
