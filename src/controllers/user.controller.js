@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
 
 const User = require('../models/user.model');
 
@@ -69,20 +70,40 @@ exports.post = async (req, res) => {
     });
   }
 
+  let user = await User.findOne({
+    email: req.body.email
+  });
+
+  if (user) {
+    return res.status(400).json({
+      ok     : false,
+      message: 'El email ya existe'
+    });
+  }
+
   try {
     const user = new User({
       name      : req.body.name,
       email     : req.body.email,
-      isCustomer: req.body.isCustomer
+      password  : bcrypt.hashSync(req.body.password, 10),
+      isCustomer: false,
+      isAdmin   : req.body.isAdmin
     });
 
-    const result = await user.save();
+    await user.save();
 
-    res.status(201).json({
-      ok  : true,
-      car : result
+    const token = user.generateJWT();
+
+    res.status(201).header('Authorization', token).json({
+      ok   : true,
+      user : {
+        _id  : user._id,
+        name : user.name,
+        email: user.email
+      }
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({
       ok     : false,
       message: 'Error al crear el elemento',

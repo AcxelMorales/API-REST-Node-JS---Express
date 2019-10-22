@@ -22,6 +22,7 @@ router.get(`${url}/:id`, userController.getOne);
 router.post(url, [
   check('name').trim().isLength({ min: 3 }),
   check('email').trim().isEmail(),
+  check('password').trim().isLength({ min: 6 })
 ], userController.post);
 
 //****************************************************************************

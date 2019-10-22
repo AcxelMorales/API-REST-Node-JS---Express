@@ -16,7 +16,7 @@ app.use(bp.urlencoded({
   extended: false
 }));
 
-app.use(bp.json())
+app.use(bp.json());
 
 //****************************************************************************
 //  ROUTES
@@ -25,6 +25,7 @@ app.use(require('./routes/cars.routes'));
 app.use(require('./routes/user.routes'));
 app.use(require('./routes/company.routes'));
 app.use(require('./routes/sale.routes'));
+app.use(require('./routes/auth/auth.routes'));
 
 //****************************************************************************
 //  LISTENER
@@ -42,4 +43,4 @@ mongoose.connect('mongodb://localhost/cars', {
   .then(()   => console.log('Database online'))
   .catch(err => console.error(err));
 
-mongoose.set('useCreateIndex', true)
+mongoose.set('useCreateIndex', true);
